@@ -1,29 +1,25 @@
 import React, { useContext, useState } from "react"
 import axios from 'axios'
-import Cookies from "universal-cookie";
-
 
 const GlobalContext = React.createContext()
 
 export const GlobalProvider = ({children}) => {
-    const cookies = new Cookies()
+    
 
     const [incomes, setIncomes] = useState([])
-    const [myCookie, setmyCookie] = useState([])
     const [expenses, setExpenses] = useState([])
     const [error, setError] = useState(null)
     const tokenoo = localStorage.getItem("token");
 
     //calculate incomes
     const addIncome = async ( income) => {
-        const Cookie = cookies.get('auth-company');
-        setmyCookie(Cookie)
+
         const updatedIncome = {
             ...income,
             type: "income"
         };
     
-        const response = await axios.post(`http://localhost:5000/income/add-income`, updatedIncome , {
+        await axios.post(`http://localhost:5000/income/add-income`, updatedIncome , {
             headers: {
                 'auth-company': tokenoo ,
               },
@@ -33,8 +29,7 @@ export const GlobalProvider = ({children}) => {
             });
     
         getIncomes();
-    };
-    
+    }; 
     const getIncomes = async () => {
         const response = await axios.get(`http://localhost:5000/income/get-income`, {
             headers: {
@@ -44,16 +39,14 @@ export const GlobalProvider = ({children}) => {
         setIncomes(response.data)
         console.log(response.data)
     };  
-
     const deleteIncome = async (id) => {
-        const res  = await axios.delete(`http://localhost:5000/income/delete-income/${id}`, {
+        await axios.delete(`http://localhost:5000/income/delete-income/${id}`, {
             headers: {
                 'auth-company':tokenoo
                     },
         })
         getIncomes()
     };
-
     const totalIncome = () => {
         let totalIncome = 0;
         incomes.forEach((income) =>{
@@ -65,14 +58,13 @@ export const GlobalProvider = ({children}) => {
 
     //calculate incomes
     const addExpense = async (income) => {
-        const Cookie = cookies.get('auth-company');
-        setmyCookie(Cookie)
+
         const updatedIncome = {
             ...income,
             type: "expense"
         };
     
-        const response = await axios.post(`http://localhost:5000/expense/add-expense`, updatedIncome , {
+        await axios.post(`http://localhost:5000/expense/add-expense`, updatedIncome , {
             headers: {
                 'auth-company': tokenoo
                },
@@ -82,7 +74,6 @@ export const GlobalProvider = ({children}) => {
             })
         getExpenses()
     };
-
     const getExpenses = async () => {
         const response = await axios.get(`http://localhost:5000/expense/get-expense`, {
             headers: {
@@ -90,18 +81,15 @@ export const GlobalProvider = ({children}) => {
                  },
         })
         setExpenses(response.data)
-        console.log(response.data)
     };
-
     const deleteExpense = async (id) => {
 
-        const res  = await axios.delete(`http://localhost:5000/expense/delete-expense/${id}` , {
+        await axios.delete(`http://localhost:5000/expense/delete-expense/${id}` , {
             headers: {
                 'auth-company': tokenoo      },
         })
         getExpenses()
     };
-
     const totalExpenses = () => {
         let totalIncome = 0;
         expenses.forEach((income) =>{
@@ -110,11 +98,9 @@ export const GlobalProvider = ({children}) => {
 
         return totalIncome;
     };
-
     const totalBalance = () => {
         return totalIncome() - totalExpenses()
     };
-
     const transactionHistory = () => {
         const history = [...incomes, ...expenses]
         history.sort((a, b) => {
@@ -123,7 +109,6 @@ export const GlobalProvider = ({children}) => {
 
         return history.slice(0, 3)
     };
-
 
     return (
         <GlobalContext.Provider value={{

@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useGlobalContext } from '../../context/globalContext';
 import Button from '../Button/Button';
 import { plus } from '../../utils/Icons';
+import Swal from 'sweetalert2';
 
 
 function Form() {
@@ -15,7 +16,7 @@ function Form() {
         date: '',
         category: '',
         description: '',
-    })
+    });
 
     const { title, amount, date, category,description } = inputState;
 
@@ -34,6 +35,12 @@ function Form() {
             category: '',
             description: '',
         })
+        Swal.fire({
+            icon: 'success',
+            title: 'Done',
+            text: 'The amount has been added successfully.'
+        });
+
     }
 
     return (
@@ -44,7 +51,7 @@ function Form() {
                     type="text" 
                     value={title}
                     name={'title'} 
-                    placeholder="Salary Title"
+                    placeholder="Amount Title English"
                     onChange={handleInput('title')}
                 />
             </div>
@@ -52,20 +59,12 @@ function Form() {
                 <input value={amount}  
                     type="text" 
                     name={'amount'} 
-                    placeholder={'Salary Amount'}
+                    placeholder={'Amount value'}
                     onChange={handleInput('amount')} 
                 />
             </div>
             <div className="input-control">
-                <DatePicker 
-                    id='date'
-                    placeholderText='Enter A Date'
-                    selected={date}
-                    dateFormat="dd/MM/yyyy"
-                    onChange={(date) => {
-                        setInputState({...inputState, date: date})
-                    }}
-                />
+                <textarea name="description" value={description} placeholder='Transaction owner' id="description" cols="30" rows="1" onChange={handleInput('description')}></textarea>
             </div>
             <div className="selects input-control">
                 <select required value={category} name="category" id="category" onChange={handleInput('category')}>
@@ -79,9 +78,6 @@ function Form() {
                     <option value="youtube">Youtube</option>  
                     <option value="other">Other</option>  
                 </select>
-            </div>
-            <div className="input-control">
-                <textarea name="description" value={description} placeholder='Add A Reference' id="description" cols="30" rows="4" onChange={handleInput('description')}></textarea>
             </div>
             <div className="submit-btn">
                 <Button 

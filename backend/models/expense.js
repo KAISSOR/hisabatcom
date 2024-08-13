@@ -19,6 +19,11 @@ const ExpenseSchema = new mongoose.Schema({
         type: String,
         default:"expense"
     },
+    // date: {
+    //     type: Date,
+    //     required: true,
+    //     trim: true
+    // },
     category: {
         type: String,
         required: true,

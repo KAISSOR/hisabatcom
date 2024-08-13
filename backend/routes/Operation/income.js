@@ -13,8 +13,11 @@ router.post("/add-income" , authCompany , async (req, res) => {
         const description = req.body.description
         const Token = req.header('auth-company');
         const CoCodee = jwt.verify(Token, 'KAISOOR');
-        const CoCode = CoCodee.CoCode
+        const CoCode = CoCodee.code
         const company = await Company.findOne({CoCode});  
+        console.log(Token)
+        console.log(CoCodee)
+        console.log(company)
 
         if (!title) {
             return res.status(404).json({ message: "title not found" });
@@ -38,14 +41,6 @@ router.post("/add-income" , authCompany , async (req, res) => {
             return res.status(404).json({ message: "company not found" });
         };
 
-        // console.log(title)
-        // console.log(amount)
-        // console.log(category)
-        // console.log(description)
-        // console.log(Token)
-        // console.log(CoCode)
-        // console.log(company)
-
         const newIncome = new Income({
             title: title,
             amount: amount,
@@ -58,13 +53,6 @@ router.post("/add-income" , authCompany , async (req, res) => {
           await newIncome.save();
           res.status(200).json(newIncome);
 
-        // {
-        //     "title" : "kaiser",
-        //     "amount" : 6666,
-        //     "category" : "mmmmmmmmmmmmmmmmmm",
-        //     "description" : "kkkkkkkkkkk"
-        // }
-
     } catch (err) {
       console.error(err);
       res.status(500).json({message: 'Server Error'})
@@ -75,7 +63,7 @@ router.get("/get-income" , authCompany , async (req, res) => {
     try {
         const Token = req.header('auth-company');
         const CoCodee = jwt.verify(Token, 'KAISOOR');
-        const CoCode = CoCodee.CoCode
+        const CoCode = CoCodee.code
         const incomes = await Income.find({CoCode})
 
         res.status(200).json(incomes)
@@ -102,4 +90,20 @@ router.delete("/delete-income/:id" , authCompany , async (req, res) => {
     }
 });
 
+router.delete("/delete-all-incomes", authCompany, async (req, res) => {
+    try {
+      const Token = req.header('auth-company');
+      const CoCodee = jwt.verify(Token, 'KAISOOR');
+      const CoCode = CoCodee.code;
+  
+      // Delete all incomes for the company
+      await Income.deleteMany({ CoCode });
+  
+      res.status(200).json({ message: 'All incomes deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
+    }
+});
+  
 module.exports = router;

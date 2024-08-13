@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { signout } from '../../utils/Icons'
 import { menuItems } from '../../utils/menuItems'
 import Cookies from "universal-cookie";
 
 function Navigation({active, setActive}) {
-    // const [myCookie, setmyCookie] = useState([])
     const cookies = new Cookies();
 
     const image = localStorage.getItem('image'); 
@@ -14,19 +13,22 @@ function Navigation({active, setActive}) {
 
     const handleLogout = () => {
         localStorage.removeItem('token'); 
-        localStorage.removeItem('image')
+        localStorage.removeItem('image');
         window.location = "/register";
         cookies.remove('auth-company');
       };
+
     return (
+
         <NavStyled>
             <div className="user-con">
             <img src={`http://localhost:5000/uploads/${image}`} alt="" />
                 <div className="text">
                     <h2>{name}</h2>
-                    <p>Your Money</p>
+                    <a href="http://localhost:3000/update">update your informiton</a>
                 </div>
             </div>
+
             <ul className="menu-items">
                 {menuItems.map((item) => {
                     return <li
@@ -39,6 +41,7 @@ function Navigation({active, setActive}) {
                     </li>
                 })}
             </ul>
+
             <div className="bottom-nav">
 
             <li onClick={handleLogout}>

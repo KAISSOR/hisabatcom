@@ -13,7 +13,7 @@ router.post("/add-expense" , authCompany , async (req, res) => {
         const description = req.body.description
         const Token = req.header('auth-company');
         const CoCodee = jwt.verify(Token, 'KAISOOR');
-        const CoCode = CoCodee.CoCode
+        const CoCode = CoCodee.code
         const company = await Company.findOne({CoCode});  
 
         if (!title) {
@@ -38,14 +38,6 @@ router.post("/add-expense" , authCompany , async (req, res) => {
             return res.status(404).json({ message: "company not found" });
         };
 
-        // console.log(title)
-        // console.log(amount)
-        // console.log(category)
-        // console.log(description)
-        // console.log(Token)
-        // console.log(CoCode)
-        // console.log(company)
-
         const newExpense = new Expense({
             title: title,
             amount: amount,
@@ -53,10 +45,10 @@ router.post("/add-expense" , authCompany , async (req, res) => {
             category: category,
             description: description,
             CoCode: CoCode,
-          });
+        });
 
-          await newExpense.save();
-          res.status(200).json(newExpense);
+        await newExpense.save();
+        res.status(200).json(newExpense);
 
     } catch (err) {
       console.error(err);
@@ -68,7 +60,7 @@ router.get("/get-expense" , authCompany , async (req, res) => {
     try {
         const Token = req.header('auth-company');
         const CoCodee = jwt.verify(Token, 'KAISOOR');
-        const CoCode = CoCodee.CoCode
+        const CoCode = CoCodee.code
         const expenses = await Expense.find({CoCode})
 
         res.status(200).json(expenses)
@@ -95,5 +87,20 @@ router.delete("/delete-expense/:id", authCompany, async (req, res) => {
     }
 });
 
+router.delete("/delete-all-expenses", authCompany, async (req, res) => {
+    try {
+      const Token = req.header('auth-company');
+      const CoCodee = jwt.verify(Token, 'KAISOOR');
+      const CoCode = CoCodee.code;
+  
+      const result = await Expense.deleteMany({ CoCode });
+  
+      res.status(200).json({ message: "All expenses deleted successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  });
+  
 
 module.exports = router;

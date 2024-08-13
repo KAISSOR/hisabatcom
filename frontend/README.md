@@ -1,122 +1,120 @@
-<!-- import  { useState , React } from "react";
-import * as Components from '../../Components';
-import {useNavigate} from 'react-router-dom';
-import axios from "axios"
-user
-function Register() {
+<!-- import React, { useState } from 'react';
+import axios from 'axios'; // Assuming you're using Axios for HTTP requests
 
-   const [error , setError] = useState("")
-   const navigate = useNavigate
-   const [signIn, toggle] = useState(true);
-   const [data , setData] = useState({
-       CoName: "",
-       CoCode: "",
-       CoPassword: "",
-       CoImage: "",
-   });
-   const [dataa , setDataa] = useState({
-       CoCode: "",
-       CoPassword: ""
-   }); 
-   const handleChange = ({ currentTarget: input}) => {
-       setData({...data , [input.name]:input.value})
-   };
-   const handleChangee = ({ currentTarget: input}) => {
-       setDataa({...dataa , [input.name]:input.value})
-   };
-   const handleSubmit = async (e) => {
-       e.preventDefault();
-       try{
-           const url = "http://localhost:5000/companies/signup";
-           const {data: res} = await axios.post(url , data)
-           navigate("/login")
-           console.log(res.message)
+const Update = () => {
+  const [companyName, setCompanyName] = useState('');
+  const [companyCode, setCompanyCode] = useState('');
+  const [companyPassword, setCompanyPassword] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const tokenoo = localStorage.getItem("token");
+  const image = localStorage.getItem('image'); 
+  const name = localStorage.getItem('name'); 
+  const [showPassword, setShowPassword] = useState(false);
 
-       }catch(error){
-           if(error.response && error.response.status >= 400 && error.response.status <= 500 ){
-               setError(error.response.data.message)
-           }
-       }
-   };
-   const handleSubmitt = async (e) => {
-       e.preventDefault();
-       try {
-         if (!dataa) {
-           throw new Error("Please fill out the form completely");
-         }
-         const url = "http://localhost:5000/companies/signup";
-         const response = await axios.post(url, dataa);  // Use response instead of destructuring for clarity
-         localStorage.setItem("token", response.data);
-         window.location = "/";
-       } catch (error) {
-         // Handle different error scenarios
-         if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-           setError(error.response.data.message); // Assuming error response has a message
-         } else {
-           setError("An unexpected error occurred. Please try again later.");  // Generic message for other errors
-         }
-       }
-   };
-toggle
-     return(
-         <Components.Container>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('CoName', companyName);
+    formData.append('CoCode', companyCode);
+    formData.append('CoPassword', companyPassword);
+
+    if (selectedImage) {
+      formData.append('profileImage', selectedImage);
+    }
+
+    try {
+      const response = await axios.put('http://localhost:5000/companies/update', formData, {
+        headers: {
+            'auth-company':tokenoo 
+                 },
+      });
+      const Image = response.data.company.CoImage;
+      const Name  = response.data.company.CoName;
+
+      localStorage.removeItem('name'); 
+      localStorage.removeItem('image');
+      localStorage.setItem("image", Image);
+      localStorage.setItem("name", Name);
+      window.location = "/"; 
+
+      setSuccessMessage(response.data.message);
+      setErrorMessage(''); // Clear any previous errors
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.message || 'Server error');
+      } else {
+        setErrorMessage('Network error');
+      }
+    } finally {
+      // Reset form fields (optional)
+      setCompanyName('');
+      setCompanyCode('');
+      setCompanyPassword('');
+      setSelectedImage(null);
+    }
+  };
 
 
 
-             <Components.SignUpContainer signinIn={signIn}>
-                 <Components.Form onSubmit={handleSubmit} enctype="multipart/form-data" >
-                     <Components.Title>Create Account</Components.Title>
-                     <Components.Input type='text' placeholder='Company Name' name = 'CoName' onChange={handleChange} value={data.CoName} required  />
-                     <Components.Input type='text' placeholder='Company code' name = 'CoCode' onChange={handleChange} value={data.CoCode} required  />
-                     <Components.Input type='password' placeholder='Password' name = 'CoPassword' onChange={handleChange} value={data.CoPassword} required />
-                     <Components.Input type='file' name = 'CoImage' onChange={handleChange} value={data.CoImage}  />
-                     {error && error.length > 0 && <div>{error}</div>}
-                     <Components.Button  type='submit' >Sign Up</Components.Button>
-                 </Components.Form>
-             </Components.SignUpContainer>
+  const handleImageChange = (event) => {
+    setSelectedImage(event.target.files[0]);
+  };
 
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="companyName">Company Name:</label>
+        <input
+          type="text"
+          id="companyName"
+          name="companyName"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="companyCode">Company Code:</label>
+        <input
+          type="text"
+          id="companyCode"
+          name="companyCode"
+          value={companyCode}
+          onChange={(e) => setCompanyCode(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        <label htmlFor="companyPassword">Company Password:</label>
+        <input
+          type={showPassword ? 'text' : 'password'}
+          id="companyPassword"
+          name="companyPassword"
+          value={companyPassword}
+          onChange={(e) => setCompanyPassword(e.target.value)}
+          required
+        />
+        <input
+          type="checkbox"
+          id="showPassword"
+          checked={showPassword}
+          onChange={() => setShowPassword(!showPassword)}
+        />
+        <label htmlFor="showPassword">Show Password</label>
+      </div> 
+      <div>
+        <label htmlFor="profileImage">Profile Image:</label>
+        <input type="file" id="profileImage" name="profileImage" onChange={handleImageChange} />
+      </div>
+      <button type="submit">Update Company Profile</button>
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
+      {successMessage && <p className="success-message">{successMessage}</p>}
+    </form>
+  );
+};
 
-             <Components.SignInContainer signinIn={signIn}>
-                  <Components.Form onSubmit={handleSubmitt}>
-                      <Components.Title>Sign in</Components.Title>
-                      <Components.Input type='email' placeholder='Email' name = 'email' onChange={handleChangee} value={dataa.email} required/>
-                      <Components.Input type='password' placeholder='Password' name = 'CoPassword' onChange={handleChangee} value={dataa.CoPassword} required />
-                      {error && error.length > 0 && <div>{error}</div>}
-                      <Components.Button type='submit' >Sigin In</Components.Button>
-                  </Components.Form>
-             </Components.SignInContainer>
-
-
-             <Components.OverlayContainer signinIn={signIn}>
-                 <Components.Overlay signinIn={signIn}>
-
-                 <Components.LeftOverlayPanel signinIn={signIn}>
-                     <Components.Title>Welcome Back!</Components.Title>
-                     <Components.Paragraph>
-                         To keep connected with us please login with your personal info
-                     </Components.Paragraph>
-                     <Components.GhostButton onClick={() => toggle(true)}>
-                         Sign In
-                     </Components.GhostButton>
-                     </Components.LeftOverlayPanel>
-
-                     <Components.RightOverlayPanel signinIn={signIn}>
-                       <Components.Title>Hello, Friend!</Components.Title>
-                       <Components.Paragraph>
-                           Enter Your personal details and start journey with us
-                       </Components.Paragraph>
-                           <Components.GhostButton onClick={() => toggle(false)}>
-                               Sigin Up
-                           </Components.GhostButton> 
-                     </Components.RightOverlayPanel>
- 
-                 </Components.Overlay>
-             </Components.OverlayContainer>
-
-
-
-         </Components.Container>
-     )
-}
-
-export default Register; -->
+export default Update; -->

@@ -7,7 +7,7 @@ const companySchema = new Schema({
         required: true,
     },
     CoCode:{
-        type: Number,
+        type: String,
         required: true,
     },
     CoPassword:{

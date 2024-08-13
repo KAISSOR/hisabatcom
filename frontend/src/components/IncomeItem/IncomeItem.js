@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { dateFormat } from '../../utils/dateFormat';
 import { bitcoin, book, calender, card, circle, clothing, comment, dollar, food, freelance, medical, money, piggy, stocks, takeaway, trash, tv, users, yt } from '../../utils/Icons';
 import Button from '../Button/Button';
-
 function IncomeItem({
     id,
     title,
@@ -73,19 +72,17 @@ function IncomeItem({
                 <h5>{title}</h5>
                 <div className="inner-content">
                     <div className="text">
-                        <p>{dollar} {amount}</p>
+                        <p> {amount}</p>
                         <p>{calender} {dateFormat(date)}</p>
-                        <p>
-                            {comment}
-                            {description}
-                        </p>
+                        <p>{comment} {description}</p>
                     </div>
                     <div className="btn-con">
                         <Button 
+                            // name={" Delete "}
                             icon={trash}
                             bPad={'1rem'}
                             bRad={'50%'}
-                            bg={'var(--primary-color'}
+                            bg={'#ff0000'}
                             color={'#fff'}
                             iColor={'#fff'}
                             hColor={'var(--color-green)'}
